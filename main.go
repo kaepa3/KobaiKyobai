@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/kaepa3/myproj/config"
-	"github.com/kaepa3/myproj/record"
+	"github.com/kaepa3/KobaiKyobai/config"
+	"github.com/kaepa3/KobaiKyobai/record"
 )
 
 const (
@@ -20,8 +20,28 @@ var dynamicConf config.DynamicConfig
 
 func main() {
 	conf, dynamicConf, _ = config.ReadAllConfig("config.toml", "dynamic.toml")
-	AnalyzeHTML()
 
+	records := CreateItemRecords()
+	sendRecord := selectSendRecord(records)
+	if len(sendRecord) != 0 {
+		newRecord := config.DynamicConfig{BeforeNewestRecord: sendRecord[0]}
+		config.WriteConfig("dynamic.toml", newRecord)
+		nortify(sendRecord)
+	}
+}
+func nortify(records []record.Record) {
+	fmt.Println("output\n")
+	fmt.Printf("%v", records)
+}
+func selectSendRecord(records []record.Record) []record.Record {
+	result := make([]record.Record, 0, 10)
+	for _, v := range records {
+		if v.Name == dynamicConf.BeforeNewestRecord.Name {
+			break
+		}
+		result = append(result, v)
+	}
+	return result
 }
 
 var re0 = regexp.MustCompile(`^(\d+)月(\d+)日`)
@@ -52,17 +72,17 @@ func createTime(s *goquery.Selection) time.Time {
 	}
 	return endtime
 }
-func AnalyzeHTML() []record.Record {
+func CreateItemRecords() []record.Record {
+	records := make([]record.Record, 0, 100)
 	if doc, err := goquery.NewDocument(AnalyzeURL); err == nil {
 		selection := doc.Find(`div.content-list`)
 		list := selection.Find(`article`)
-		fmt.Printf("%d:size\n", list.Size())
 		list.Each(func(index int, s *goquery.Selection) {
 			name := createName(s)
 			endTime := createTime(s)
 			rec := record.Record{name, endTime}
-			rec.PutSlack()
+			records = append(records, rec)
 		})
 	}
-	return []record.Record{}
+	return records
 }

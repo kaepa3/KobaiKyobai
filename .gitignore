@@ -1,3 +1,22 @@
+### https://raw.github.com/github/gitignore/21e9f06539cdbc1ccbbb2ce59cd667be3e172fc8/Go.gitignore
+
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+# Dependency directories (remove the comment below to include it)
+# vendor/
+
+
 ### https://raw.github.com/github/gitignore/21e9f06539cdbc1ccbbb2ce59cd667be3e172fc8/Global/macOS.gitignore
 
 # General
@@ -28,22 +47,21 @@ Temporary Items
 .apdisk
 
 
-### https://raw.github.com/github/gitignore/21e9f06539cdbc1ccbbb2ce59cd667be3e172fc8/Go.gitignore
+### https://raw.github.com/github/gitignore/21e9f06539cdbc1ccbbb2ce59cd667be3e172fc8/Global/Linux.gitignore
 
-# Binaries for programs and plugins
-*.exe
-*.exe~
-*.dll
-*.so
-*.dylib
+*~
 
-# Test binary, built with `go test -c`
-*.test
+# temporary files which can be created if a process still has a handle open of a deleted file
+.fuse_hidden*
 
-# Output of the go coverage tool, specifically when used with LiteIDE
-*.out
+# KDE directory preferences
+.directory
 
-# Dependency directories (remove the comment below to include it)
-# vendor/
+# Linux trash folder which might appear on any partition or disk
+.Trash-*
 
-config.toml
+# .nfs files are created when an open file is removed but is still being accessed
+.nfs*
+
+
+dynamic.toml

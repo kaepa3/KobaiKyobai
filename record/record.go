@@ -1,7 +1,6 @@
 package record
 
 import (
-	"fmt"
 	"time"
 )
 
@@ -9,9 +8,4 @@ import (
 type Record struct {
 	Name string
 	Date time.Time
-}
-
-// PutSlack is post slack
-func (h *Record) PutSlack() {
-	fmt.Printf("%v!", h)
 }
