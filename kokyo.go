@@ -4,15 +4,13 @@ import (
 	"fmt"
 	"regexp"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/kaepa3/KobaiKyobai/config"
 	"github.com/kaepa3/KobaiKyobai/record"
-)
-
-const (
-	AnalyzeURL = `https://競売公売.com/auction/find?pid=14`
+	"github.com/kaepa3/KobaiKyobai/slack"
 )
 
 var conf config.Config
@@ -27,11 +25,28 @@ func main() {
 		newRecord := config.DynamicConfig{BeforeNewestRecord: sendRecord[0]}
 		config.WriteConfig("dynamic.toml", newRecord)
 		nortify(sendRecord)
+	} else {
+		fmt.Println("no record")
 	}
 }
 func nortify(records []record.Record) {
-	fmt.Println("output\n")
-	fmt.Printf("%v", records)
+	msg := createMsg(records)
+	sender := slack.Slack{
+		Text:      msg,
+		Username:  "From golang to slack hello",
+		IconEmoji: ":gopher:",
+		IconURL:   "",
+		Channel:   "",
+	}
+	sender.Send(conf.IncomingURL)
+}
+func createMsg(records []record.Record) string {
+	list := make([]string, 0, 100)
+	for _, rec := range records {
+		list = append(list, rec.Name)
+	}
+	msg := fmt.Sprintf("%s\n%s\n%s\n", conf.NortifyUser, strings.Join(list, "\n"), conf.AnalyzeURL)
+	return msg
 }
 func selectSendRecord(records []record.Record) []record.Record {
 	result := make([]record.Record, 0, 10)
@@ -74,7 +89,7 @@ func createTime(s *goquery.Selection) time.Time {
 }
 func CreateItemRecords() []record.Record {
 	records := make([]record.Record, 0, 100)
-	if doc, err := goquery.NewDocument(AnalyzeURL); err == nil {
+	if doc, err := goquery.NewDocument(conf.AnalyzeURL); err == nil {
 		selection := doc.Find(`div.content-list`)
 		list := selection.Find(`article`)
 		list.Each(func(index int, s *goquery.Selection) {

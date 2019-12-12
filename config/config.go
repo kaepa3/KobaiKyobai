@@ -3,7 +3,6 @@ package config
 import (
 	"log"
 	"os"
-	"time"
 
 	"github.com/BurntSushi/toml"
 	"github.com/kaepa3/KobaiKyobai/record"
@@ -11,15 +10,17 @@ import (
 
 // Config this app config
 type Config struct {
-	LastDate time.Time
+	IncomingURL string
+	AnalyzeURL  string
+	NortifyUser string
 }
 
 type DynamicConfig struct {
 	BeforeNewestRecord record.Record
 }
 
-func ReadConfig(path string) (*interface{}, bool) {
-	var config interface{}
+func ReadConfig(path string) (*Config, bool) {
+	var config Config
 	_, err := toml.DecodeFile(path, &config)
 	if err != nil {
 		return nil, false
@@ -39,8 +40,7 @@ func ReadAllConfig(staticPath, dynamicPath string) (Config, DynamicConfig, strin
 	// readconfig
 	var conf Config
 	if itf, ok := ReadConfig(staticPath); ok {
-		static := *itf
-		conf, _ = static.(Config)
+		conf = *itf
 	} else {
 		conf = Config{}
 	}
